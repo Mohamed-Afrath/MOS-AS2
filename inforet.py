@@ -13,6 +13,7 @@ import numpy as np
 nltk.download('wordnet',quiet=True)
 nltk.download('stopwords',quiet=True)
 nltk.download('averaged_perceptron_tagger',quiet=True)
+nltk.download('averaged_perceptron_tagger_eng',quiet=True)
 nltk.download('punkt',quiet=True)
 
 app = Flask(__name__)
