@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -205,7 +206,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .suggestions {
@@ -532,6 +535,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -541,7 +545,7 @@
             <h1>AIVista</h1>
             <p class="subtitle">Search through your image collection using AI-powered visual understanding</p>
         </header>
-        
+
         <div class="search-container">
             <div class="search-box">
                 <input type="text" id="search-input" placeholder="Search for objects, scenes, or concepts..." autofocus>
@@ -550,7 +554,7 @@
                 </button>
             </div>
         </div>
-        
+
         <div class="search-options">
             <div>
                 <label for="search-model"><i class="fas fa-cogs"></i> Search Model:</label>
@@ -564,7 +568,7 @@
                 <i class="fas fa-info-circle"></i> VSM uses TF-IDF and cosine similarity for general similarity matching
             </div>
         </div>
-        
+
         <div class="stats">
             <div class="stat-box">
                 <i class="fas fa-database"></i>
@@ -575,12 +579,12 @@
                 <span><span id="term-count">0</span> visual concepts</span>
             </div>
         </div>
-        
+
         <div class="loading" id="loading-indicator">
             <div class="spinner"></div>
             <p>Analyzing visual concepts...</p>
         </div>
-        
+
         <div class="suggestions" id="suggestions">
             <h3><i class="fas fa-lightbulb"></i> No exact matches found</h3>
             <p>Try these suggestions to improve your search:</p>
@@ -591,7 +595,7 @@
                 <li>Switch to a different search model</li>
             </ul>
         </div>
-        
+
         <div id="results-area">
             <div class="results-header">
                 <h2 class="results-title">
@@ -605,13 +609,13 @@
                     <span id="results-count">0 results</span>
                 </div>
             </div>
-            
+
             <div class="pagination-info" id="pagination-info"></div>
-            
+
             <div class="results-grid" id="results-container">
                 <!-- Results will be inserted here -->
             </div>
-            
+
             <div class="pagination" id="pagination">
                 <!-- Pagination buttons will be inserted here -->
             </div>
@@ -619,7 +623,7 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Constants
             const RESULTS_PER_PAGE = 12;
             const MODEL_NAMES = {
@@ -632,14 +636,14 @@
                 'bm25': '#7209b7',
                 'unigram': '#f72585'
             };
-            
+
             // State variables
             let currentPage = 1;
             let totalResults = 0;
             let currentQuery = 'all';
             let currentModel = 'vsm';
             let allResults = [];
-            
+
             // DOM elements
             const searchInput = document.getElementById('search-input');
             const searchButton = document.getElementById('search-button');
@@ -655,26 +659,26 @@
             const pagination = document.getElementById('pagination');
             const imageCount = document.getElementById('image-count');
             const termCount = document.getElementById('term-count');
-            
+
             // Model descriptions
             const modelDescriptions = {
                 'vsm': '<i class="fas fa-info-circle"></i> VSM uses TF-IDF and cosine similarity for general similarity matching',
                 'bm25': '<i class="fas fa-info-circle"></i> BM25 is a probabilistic model better for longer descriptions and term frequency saturation',
                 'unigram': '<i class="fas fa-info-circle"></i> Unigram Language Model uses probability-based matching with smoothing for unseen terms'
             };
-            
+
             // Initialize
             updateStats();
             performSearch('all', 'vsm');
-            
+
             // Event listeners
-            searchModel.addEventListener('change', function() {
+            searchModel.addEventListener('change', function () {
                 currentModel = this.value;
                 modelInfo.innerHTML = modelDescriptions[this.value];
                 updateModelIndicator();
                 performSearch(currentQuery, currentModel);
             });
-            
+
             searchButton.addEventListener('click', () => {
                 const query = searchInput.value.trim();
                 if (query) {
@@ -683,7 +687,7 @@
                     performSearch(query, currentModel);
                 }
             });
-            
+
             searchInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     const query = searchInput.value.trim();
@@ -694,7 +698,7 @@
                     }
                 }
             });
-            
+
             // Functions
             function updateModelIndicator() {
                 modelIndicator.innerHTML = `
@@ -702,7 +706,7 @@
                     ${MODEL_NAMES[currentModel]}
                 `;
             }
-            
+
             function updateStats() {
                 fetch('/search?q=all')
                     .then(response => response.json())
@@ -712,25 +716,25 @@
                         termCount.textContent = Math.floor(data.count * 3.5);
                     });
             }
-            
+
             function extractFilename(path) {
                 return path.replace(/\\/g, '/').split('/').pop();
             }
-            
+
             function performSearch(query, model) {
                 loadingIndicator.style.display = 'flex';
                 resultsContainer.innerHTML = '';
                 suggestions.style.display = 'none';
                 pagination.innerHTML = '';
                 paginationInfo.textContent = '';
-                
+
                 fetch(`/search?q=${encodeURIComponent(query)}&model=${model}`)
                     .then(response => response.json())
                     .then(data => {
                         loadingIndicator.style.display = 'none';
                         allResults = data.results;
                         totalResults = allResults.length;
-                        
+
                         // Update results header
                         if (query === 'all') {
                             resultsTitle.textContent = 'All Images';
@@ -738,15 +742,15 @@
                             resultsTitle.innerHTML = `Results for <span class="query-term">"${query}"</span>`;
                         }
                         resultsCount.innerHTML = `<span>${totalResults}</span> ${totalResults === 1 ? 'result' : 'results'}`;
-                        
+
                         if (totalResults === 0) {
                             showNoResults();
                             return;
                         }
-                        
+
                         // Display paginated results
                         displayResults(currentPage);
-                        
+
                         // Setup pagination
                         setupPagination();
                     })
@@ -755,7 +759,7 @@
                         showError(error);
                     });
             }
-            
+
             function showNoResults() {
                 resultsContainer.innerHTML = `
                     <div class="no-results">
@@ -766,7 +770,7 @@
                 `;
                 suggestions.style.display = 'block';
             }
-            
+
             function showError(error) {
                 resultsContainer.innerHTML = `
                     <div class="no-results">
@@ -776,30 +780,30 @@
                     </div>
                 `;
             }
-            
+
             function displayResults(page) {
                 resultsContainer.innerHTML = '';
                 const start = (page - 1) * RESULTS_PER_PAGE;
                 const end = start + RESULTS_PER_PAGE;
                 const paginatedResults = allResults.slice(start, end);
-                
+
                 if (paginatedResults.length === 0) {
                     showNoResults();
                     return;
                 }
-                
+
                 paginatedResults.forEach(result => {
                     const resultCard = document.createElement('div');
                     resultCard.className = 'result-card';
-                    
+
                     const imageFilename = extractFilename(result.image_path);
                     const imageUrl = `/images/${imageFilename}`;
-                    
+
                     // Format score as percentage if < 1, otherwise as fixed decimal
-                    const scoreDisplay = result.score < 1 ? 
-                        `${Math.round(result.score * 100)}%` : 
+                    const scoreDisplay = result.score < 1 ?
+                        `${Math.round(result.score * 100)}%` :
                         result.score.toFixed(1);
-                    
+
                     resultCard.innerHTML = `
                         <div class="result-image-container">
                             <img src="${imageUrl}" 
@@ -821,20 +825,30 @@
                             </div>
                         </div>
                     `;
-                    
+
                     resultsContainer.appendChild(resultCard);
                 });
-                
+
                 // Update pagination info
                 paginationInfo.textContent = `Showing ${start + 1}-${Math.min(end, totalResults)} of ${totalResults} images`;
             }
-            
+
+            function updateActivePageButton() {
+                const buttons = document.querySelectorAll('.pagination button');
+                buttons.forEach(button => {
+                    button.classList.remove('active');
+                    if (parseInt(button.textContent) === currentPage) {
+                        button.classList.add('active');
+                    }
+                });
+            }
+
             function setupPagination() {
                 pagination.innerHTML = '';
                 const totalPages = Math.ceil(totalResults / RESULTS_PER_PAGE);
-                
+
                 if (totalPages <= 1) return;
-                
+
                 // Previous button
                 const prevButton = document.createElement('button');
                 prevButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
@@ -843,30 +857,31 @@
                     if (currentPage > 1) {
                         currentPage--;
                         displayResults(currentPage);
-                        window.scrollTo({top: 0, behavior: 'smooth'});
+                        updateActivePageButton(); 
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
                 });
                 pagination.appendChild(prevButton);
-                
+
                 // Page buttons
                 const maxVisiblePages = 5;
                 let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
                 let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-                
+
                 if (endPage - startPage + 1 < maxVisiblePages) {
                     startPage = Math.max(1, endPage - maxVisiblePages + 1);
                 }
-                
+
                 if (startPage > 1) {
                     const firstPageButton = document.createElement('button');
                     firstPageButton.textContent = '1';
                     firstPageButton.addEventListener('click', () => {
                         currentPage = 1;
                         displayResults(currentPage);
-                        window.scrollTo({top: 0, behavior: 'smooth'});
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
                     });
                     pagination.appendChild(firstPageButton);
-                    
+
                     if (startPage > 2) {
                         const ellipsis = document.createElement('span');
                         ellipsis.textContent = '...';
@@ -874,7 +889,7 @@
                         pagination.appendChild(ellipsis);
                     }
                 }
-                
+
                 for (let i = startPage; i <= endPage; i++) {
                     const pageButton = document.createElement('button');
                     pageButton.textContent = i;
@@ -884,11 +899,12 @@
                     pageButton.addEventListener('click', () => {
                         currentPage = i;
                         displayResults(currentPage);
-                        window.scrollTo({top: 0, behavior: 'smooth'});
+                        updateActivePageButton(); 
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
                     });
                     pagination.appendChild(pageButton);
                 }
-                
+
                 if (endPage < totalPages) {
                     if (endPage < totalPages - 1) {
                         const ellipsis = document.createElement('span');
@@ -896,17 +912,18 @@
                         ellipsis.style.padding = '0.5rem 0';
                         pagination.appendChild(ellipsis);
                     }
-                    
+
                     const lastPageButton = document.createElement('button');
                     lastPageButton.textContent = totalPages;
                     lastPageButton.addEventListener('click', () => {
                         currentPage = totalPages;
                         displayResults(currentPage);
-                        window.scrollTo({top: 0, behavior: 'smooth'});
+                        updateActivePageButton(); 
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
                     });
                     pagination.appendChild(lastPageButton);
                 }
-                
+
                 // Next button
                 const nextButton = document.createElement('button');
                 nextButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
@@ -915,15 +932,17 @@
                     if (currentPage < totalPages) {
                         currentPage++;
                         displayResults(currentPage);
-                        window.scrollTo({top: 0, behavior: 'smooth'});
+                        updateActivePageButton(); 
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
                 });
                 pagination.appendChild(nextButton);
             }
-            
+
             // Initialize model indicator
             updateModelIndicator();
         });
     </script>
 </body>
+
 </html>
