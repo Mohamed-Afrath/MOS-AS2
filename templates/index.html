@@ -574,10 +574,10 @@
                 <i class="fas fa-database"></i>
                 <span>Indexed <span id="image-count">0</span> images</span>
             </div>
-            <div class="stat-box">
+            <!-- <div class="stat-box">
                 <i class="fas fa-tags"></i>
                 <span><span id="term-count">0</span> visual concepts</span>
-            </div>
+            </div> -->
         </div>
 
         <div class="loading" id="loading-indicator">
@@ -811,7 +811,7 @@
                                  class="result-image"
                                  loading="lazy"
                                  onerror="this.onerror=null;this.src='/static/no-image.png';this.style.objectFit='contain'">
-                            <span class="result-score">${scoreDisplay} match</span>
+                            
                         </div>
                         <div class="result-content">
                             <h3 class="result-title">${result.alt_text || 'No description available'}</h3>
