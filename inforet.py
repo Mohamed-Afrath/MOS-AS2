@@ -812,23 +812,23 @@ def home():
     return render_template("index.html")
 
 
-@app.route("/evaluate", methods=["GET"])
-def evaluate():
-    model = request.args.get("model", "vsm")  # Default to VSM
-    evaluation_results = []
+# @app.route("/evaluate", methods=["GET"])
+# def evaluate():
+#     model = request.args.get("model", "vsm")  # Default to VSM
+#     evaluation_results = []
 
-    for query, relevant_docs in TEST_QUERIES.items():
-        metrics = indexer.evaluate_query(query, relevant_docs, model)
-        evaluation_results.append(metrics)
+#     for query, relevant_docs in TEST_QUERIES.items():
+#         metrics = indexer.evaluate_query(query, relevant_docs, model)
+#         evaluation_results.append(metrics)
 
-    return jsonify(
-        {
-            "model": model,
-            "results": evaluation_results,
-            "average_precision": sum(m["ap"] for m in evaluation_results)
-            / len(evaluation_results),
-        }
-    )
+#     return jsonify(
+#         {
+#             "model": model,
+#             "results": evaluation_results,
+#             "average_precision": sum(m["ap"] for m in evaluation_results)
+#             / len(evaluation_results),
+#         }
+#     )
 
 
 @app.route("/search", methods=["GET"])
